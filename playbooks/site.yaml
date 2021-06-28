@@ -1,0 +1,32 @@
+---
+- name: Setup Basics
+  hosts: all
+  gather_facts: true
+  become: false
+  roles:
+    - hostname
+    - authorize_github_keys
+    - update_system
+    - remote_backups
+- name: Setup Firewall
+  hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - firewall
+- name: Harden SSH
+  hosts: all
+  vars:
+    # ssh-hardening variables
+    # https://galaxy.ansible.com/dev-sec/ssh-hardening
+    network_ipv6_enable: false
+    ssh_server_enabled: true
+    ssh_compression: true
+    ssh_use_pam: false
+    ssh_print_motd: true
+    sftp_enabled: true
+    ssh_challengeresponseauthentication: false
+    ssh_server_password_login: false
+  become: yes
+  roles:
+    - dev-sec.ssh-hardening

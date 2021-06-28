@@ -1,0 +1,8 @@
+---
+- name: "Authorize ssh keys registered to https://github.com/{{ github_user }}.keys"
+  become: no
+  get_url:
+    url: "https://github.com/{{ github_user }}.keys"
+    dest: "{{ ansible_user_dir }}/.ssh/authorized_keys"
+    mode: "u=rw,g=,o="
+    force: "{{ always_download_keys | default('false') }}"

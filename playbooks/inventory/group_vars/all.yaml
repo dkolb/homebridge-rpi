@@ -1,0 +1,18 @@
+ansible_user: pi
+github_user: dkolb
+always_download_keys: true
+
+remote_backups_over_nfs: true
+remote_backups_nfs_host: zenuc.home.krinchan.com
+remote_backups_nfs_export: /mnt/FileServer/HomebridgeBackups
+remote_backups_nfs_mount_point: "{{ ansible_user_dir }}/homebridge_backups"
+# remote_backups_nfs_options: hard,intr,noexec,tcp,port=2049
+
+firewall_all_bridge_ports:
+  - 443
+  - 51813
+  - 56324
+  - 53027
+  - 30193
+  - 37320
+  

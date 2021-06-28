@@ -1,0 +1,4 @@
+---
+- name: Restart ufw
+  community.general.ufw:
+    state: reloaded

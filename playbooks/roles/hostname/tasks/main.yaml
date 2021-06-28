@@ -1,0 +1,6 @@
+---
+- name: Ensure Hostname Set
+  become: yes
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+    use: systemd

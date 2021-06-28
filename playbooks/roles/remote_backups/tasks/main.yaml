@@ -1,0 +1,23 @@
+---
+- name: Install nfs, rsync packages
+  become: yes
+  ansible.builtin.apt:
+    name: 
+      - nfs-common
+      - rsync
+    state: present
+- name: Mount NFS Share
+  become: yes
+  ansible.posix.mount:
+    backup: true
+    fstype: nfs
+    opts: "{{ remote_backups_nfs_options | default('hard,intr,noexec,tcp,port=2049') }}"
+    path: "{{ remote_backups_nfs_mount_point }}"
+    src: "{{ remote_backups_nfs_host }}:{{ remote_backups_nfs_export }}"
+    state: mounted
+- name: Setup backups cron
+  ansible.builtin.cron:
+    name: "Backup homebridge backups to file server"
+    minute: 0
+    # remaining fields default to "*"
+    job: rsync -rt --delete /var/lib/homebridge/backups {{ remote_backups_nfs_mount_point }}

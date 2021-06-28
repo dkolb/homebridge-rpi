@@ -1,0 +1,82 @@
+---
+- name: Install ufw
+  ansible.builtin.apt:
+    name:
+      - ufw
+    state: present
+- name: Configure ufw
+  ansible.builtin.copy:
+    dest: /etc/default/ufw
+    src: "{{ role_path }}/resources/etc/default/ufw"
+  notify:
+    - Restart ufw
+- name: Open bridge ports
+  community.general.ufw:
+    rule: allow
+    comment: Homebridge specific ports.
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ firewall_all_bridge_ports }}"
+  notify:
+    - Restart ufw
+- name: Open SSH to LAN network
+  community.general.ufw:
+    rule: allow
+    comment: Allow LAN-net to ssh in.
+    port: 22
+    proto: tcp
+    from_ip: "192.168.86.0/24"
+  notify:
+    - Restart ufw
+- name: Block SSH from everywhere else.
+  community.general.ufw:
+    comment: Deny other networks to access SSH
+    rule: deny
+    port: 22
+  notify:
+    - Restart ufw
+- name: Allow Homebridge Kasa Discovery
+  community.general.ufw:
+    comment: Allow Kasa Discovery on port 9999
+    rule: allow
+    port: 9999
+    proto: udp
+    from_ip: 192.168.2.0/24
+  notify:
+    - Restart ufw
+- name: Allow mDNS/multicast in
+  community.general.ufw:
+    comment: Allow mDNS/multicast in
+    rule: allow
+    proto: udp
+    from_ip: 224.0.0.0/4
+    direction: in
+  notify:
+    - Restart ufw
+- name: Allow mDNS/multicast out
+  community.general.ufw:
+    comment: Allow mDNS/multicast out
+    rule: allow
+    proto: udp
+    to_ip: 224.0.0.0/4
+    direction: out
+  notify:
+    - Restart ufw
+- name: Allow IGMP in
+  community.general.ufw:
+    comment: Allow IGMP in
+    rule: allow
+    proto: igmp
+    from_ip: 224.0.0.0/4
+    direction: in
+  notify:
+    - Restart ufw
+- name: Allow IGMP out
+  community.general.ufw:
+    comment: Allow IGMP out
+    rule: allow
+    proto: igmp
+    to_ip: 224.0.0.0/4
+    direction: out
+  notify:
+    - Restart ufw
